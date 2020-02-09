@@ -5,7 +5,9 @@ and AudioClip.
 """
 
 from copy import copy
-
+from functools import reduce
+from operator import add
+from numbers import Real
 import numpy as np
 import proglog
 from tqdm import tqdm
@@ -499,3 +501,21 @@ class Clip:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+
+    def __getitem__(self, key):        
+        if isinstance(key, Real):
+            # get a frame
+            return self.get_frame(key)
+        if isinstance(key, slice):
+            # get a subclip
+            return self.subclip(key.start, key.stop)
+        elif isinstance(key, tuple):
+            # get a concatenation of subclips
+            return reduce(add, (self[k] for k in key))
+
+    def __add__(self, other):
+        self_type = type(self).__name__
+        other_type = type(other).__name__
+        message = "unsupported operand type(s) for +: '{}' and '{}'"
+        raise TypeError(message.format(self_type, other_type))
+>>>>>>> c060949... implement basic add and getitem dunder methods

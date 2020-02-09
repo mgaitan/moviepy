@@ -760,6 +760,14 @@ class VideoClip(Clip):
         self.audio = self.audio.fx(fun, *a, **k)
 
 
+    def __add__(self, other):
+        if isinstance(other, VideoClip):
+            from moviepy.video.compositing.concatenate import concatenate_videoclips
+            method = "chain" if self.size == other.size else "compose"
+            return concatenate_videoclips([self, other], method=method)
+        return super(VideoClip, self).__add__(other)
+
+
 class DataVideoClip(VideoClip):
     """
     Class of video clips whose successive frames are functions
