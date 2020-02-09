@@ -4,8 +4,8 @@ from functools import reduce
 from moviepy.audio.AudioClip import CompositeAudioClip
 from moviepy.tools import deprecated_version_of
 from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
-from moviepy.video.compositing.on_color import on_color
 from moviepy.video.VideoClip import ColorClip, VideoClip
+
 
 
 def concatenate_videoclips(clips, method="chain", transition=None,
@@ -108,7 +108,7 @@ def concatenate_videoclips(clips, method="chain", transition=None,
         result.audio = CompositeAudioClip([a.set_start(t)
                                 for a,t in audio_t])
 
-    fpss = [c.fps for c in clips if getattr(c, 'fps', None) is not None]
+    fpss = [c.fps for c in clips if getattr(c, 'fps', None)]
     result.fps = max(fpss) if fpss else None
     return result
 
