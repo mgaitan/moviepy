@@ -508,7 +508,7 @@ class Clip:
             return self.get_frame(key)
         if isinstance(key, slice):
             # get a subclip
-            return self.subclip(key.start, key.stop)
+            return self.subclip(key.start or 0, key.stop or self.duration)
         elif isinstance(key, tuple):
             # get a concatenation of subclips
             return reduce(add, (self[k] for k in key))
