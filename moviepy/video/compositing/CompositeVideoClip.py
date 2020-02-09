@@ -82,7 +82,8 @@ class CompositeVideoClip(VideoClip):
         
         # compute duration
         ends = [c.end for c in self.clips]
-        if None not in ends:
+
+        if all(ends):
             duration = max(ends)
             self.duration = duration
             self.end = duration
