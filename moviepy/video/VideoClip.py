@@ -966,7 +966,11 @@ class ImageClip(VideoClip):
             apply_to = ['mask', 'audio']
         for attr in apply_to:
             a = getattr(self, attr, None)
+<<<<<<< HEAD
             if a is not None:
+=======
+            if a:
+>>>>>>> 4c365bf... etattr with default instead hasattr (flatten code)
                 new_a = a.fl_time(time_func)
                 setattr(self, attr, new_a)
 
