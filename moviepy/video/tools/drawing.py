@@ -5,7 +5,6 @@ methods that are difficult to do with the existing Python libraries.
 
 import numpy as np
 
-
 def blit(im1, im2, pos=None, mask=None, ismask=False):
     """ Blit an image over another.
     
@@ -37,14 +36,15 @@ def blit(im1, im2, pos=None, mask=None, ismask=False):
 
     new_im2 = +im2
 
-    if mask is None:
-        new_im2[yp1:yp2, xp1:xp2] = blitted
-    else:
+    if mask:
         mask = mask[y1:y2, x1:x2]
         if len(im1.shape) == 3:
             mask = np.dstack(3 * [mask])
         blit_region = new_im2[yp1:yp2, xp1:xp2]
         new_im2[yp1:yp2, xp1:xp2] = (1.0 * mask * blitted + (1.0 - mask) * blit_region)
+    else:
+        new_im2[yp1:yp2, xp1:xp2] = blitted
+
     return new_im2.astype('uint8') if (not ismask) else new_im2
 
 
@@ -161,14 +161,13 @@ def color_gradient(size,p1,p2=None,vector=None, r=None, col1=0,col2=1.0,
     
     elif shape == 'radial':
         if r is None:
-           r = norm
-
-        if r == 0:
+            r = norm
+        elif r == 0:
             arr = np.ones((h,w))
         else:
-            arr = (np.sqrt(((M - p1) ** 2).sum(axis=2))) - offset * r
+            arr = (np.sqrt(((M- p1)**2).sum(axis=2)))-offset*r
             arr = arr / ((1-offset)*r)
-            arr = np.minimum(1.0, np.maximum(0, arr))
+            arr = np.minimum(1.0,np.maximum(0, arr) )
                 
         if col1.size > 1:
             arr = np.dstack(3*[arr])
@@ -220,7 +219,7 @@ def color_split(size,x=None,y=None,p1=None,p2=None,vector=None,
     >>> color_split(size, x=50, col1=[255,0,0], col2=[0,255,0])
     >>> # An image splitted along an arbitrary line (see below) 
     >>> color_split(size, p1=[20,50], p2=[25,70] col1=0, col2=1)
-            
+        
     """
     
     if grad_width or ( (x is None) and (y is None)):
@@ -236,11 +235,12 @@ def color_split(size,x=None,y=None,p1=None,p2=None,vector=None,
         x,y = vector
         vector = np.array([y,-x]).astype('float')
         norm = np.linalg.norm(vector)
-        vector = max(0.1, grad_width) * vector / norm
+        vector =  max(0.1,grad_width)*vector/norm
         return color_gradient(size,p1,vector=vector,
-                              col1 = col1, col2 = col2, shape='linear')
+                         col1 = col1, col2 = col2, shape='linear')
     else:
-        w, h = size
+        
+        w,h = size
         shape = (h, w) if np.isscalar(col1) else (h, w, len(col1))
         arr = np.zeros(shape)
         if x:
@@ -249,12 +249,13 @@ def color_split(size,x=None,y=None,p1=None,p2=None,vector=None,
         elif y:
             arr[:y] = col1
             arr[y:] = col2
+            
         return arr
      
     # if we are here, it means we didn't exit with a proper 'return'
     print( "Arguments in color_split not understood !" )
     raise
-        
+    
 def circle(screensize, center, radius, col1=1.0, col2=0, blur=1):
     """ Draw an image with a circle.
     
@@ -263,6 +264,6 @@ def circle(screensize, center, radius, col1=1.0, col2=0, blur=1):
     with a radius ``radius`` but slightly blurred on the border by ``blur``
     pixels
     """
-    offset = 1.0*(radius-blur)/radius if radius else 0              
     return color_gradient(screensize,p1=center,r=radius, col1=col1,
-                          col2=col2, shape='radial', offset=offset)
+              col2=col2, shape='radial', offset = 0 if (radius==0) else
+                                              1.0*(radius-blur)/radius)
