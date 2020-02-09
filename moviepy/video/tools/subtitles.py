@@ -36,7 +36,7 @@ class SubtitlesClip(VideoClip):
 
     def __init__(self, subtitles, make_textclip=None):
         
-        VideoClip.__init__(self, has_constant_size=False)
+        super(VideoClip, self).__init__(has_constant_size=False)
 
         if isinstance(subtitles, str):
             subtitles = file_to_subtitles(subtitles)
