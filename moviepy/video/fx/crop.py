@@ -28,7 +28,6 @@ def crop(clip, x1=None, y1=None, x2=None, y2=None, width=None, height=None, x_ce
     >>> crop(x_center=300, width=400, y1=100, y2=600)
     
     """
-
     if width and x1 is not None:
         x2 = x1 + width
     elif width and x2 is not None:
