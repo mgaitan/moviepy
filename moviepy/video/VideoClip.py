@@ -525,7 +525,6 @@ class VideoClip(Clip):
 
         img = self.get_frame(ct)
         mask = self.mask.get_frame(ct) if self.mask else None                
-        
         if mask is not None and ((img.shape[0] != mask.shape[0]) or (img.shape[1] != mask.shape[1])):
             img = self.fill_array(img, mask.shape)
 
@@ -547,8 +546,9 @@ class VideoClip(Clip):
         # is the position relative (given in % of the clip's size) ?
         if self.relative_pos:
             for i, dim in enumerate([wf, hf]):
-                if not isinstance(pos[i], str):
-                    pos[i] = dim * pos[i]
+                if isinstance(pos[i], str):
+                    continue
+                pos[i] = dim * pos[i]
 
         if isinstance(pos[0], str):
             D = {'left': 0, 'center': (wf - wi) / 2, 'right': wf - wi}
