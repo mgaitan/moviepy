@@ -516,7 +516,7 @@ class VideoClip(Clip):
         """
         hf, wf = framesize = picture.shape[:2]
 
-        if self.ismask and picture.max():
+        if self.ismask and picture.max() != 0:
             return np.minimum(1, picture + self.blit_on(np.zeros(framesize), t))
 
         ct = t - self.start  # clip time
@@ -525,7 +525,12 @@ class VideoClip(Clip):
 
         img = self.get_frame(ct)
         mask = self.mask.get_frame(ct) if self.mask else None                
+<<<<<<< HEAD
         if mask is not None and ((img.shape[0] != mask.shape[0]) or (img.shape[1] != mask.shape[1])):
+=======
+        
+        if mask and ((img.shape[0] != mask.shape[0]) or (img.shape[1] != mask.shape[1])):
+>>>>>>> dfed921... fix regression on blit_on
             img = self.fill_array(img, mask.shape)
 
         hi, wi = img.shape[:2]
@@ -965,11 +970,7 @@ class ImageClip(VideoClip):
             apply_to = ['mask', 'audio']
         for attr in apply_to:
             a = getattr(self, attr, None)
-<<<<<<< HEAD
             if a is not None:
-=======
-            if a:
->>>>>>> 4c365bf... etattr with default instead hasattr (flatten code)
                 new_a = a.fl_time(time_func)
                 setattr(self, attr, new_a)
 
