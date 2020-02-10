@@ -93,7 +93,6 @@ def credits1(creditfile, width, stretch=30, color='white', stroke_color='black',
                 oneline = False
             else:
                 texts.append(['\n', l])
-
     left, right = ("".join(l) for l in zip(*texts))
     
     # MAKE TWO COLUMNS FOR THE CREDITS    
