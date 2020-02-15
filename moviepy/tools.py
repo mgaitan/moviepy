@@ -1,12 +1,14 @@
 """
 Misc. useful functions that can be used at many places in the program.
 """
-import os
+from numbers import Real
 import subprocess as sp
 import sys
 import warnings
-
 import proglog
+
+import os
+from .compat import DEVNULL
 
 
 
@@ -34,9 +36,9 @@ def subprocess_call(cmd, logger='bar', errorprint=True):
     logger = proglog.default_bar_logger(logger)
     logger(message='Moviepy - Running:\n>>> "+ " ".join(cmd)')
 
-    popen_params = {"stdout": sp.DEVNULL,
+    popen_params = {"stdout": DEVNULL,
                     "stderr": sp.PIPE,
-                    "stdin": sp.DEVNULL}
+                    "stdin": DEVNULL}
 
     if os.name == "nt":
         popen_params["creationflags"] = 0x08000000
@@ -55,13 +57,17 @@ def subprocess_call(cmd, logger='bar', errorprint=True):
 
     del proc
 
+def is_string(obj):
+    """ Returns true if s is string or string-like object,
+    compatible with Python 2 and Python 3."""
+    try:
+        return isinstance(obj, basestring)
+    except NameError:
+        return isinstance(obj, str)
+
 
 def cvsecs(time):
-    """ Will convert any time into seconds. 
-    
-    If the type of `time` is not valid, 
-    it's returned as is. 
-
+    """ Will convert any time into seconds.
     Here are the accepted formats::
 
     >>> cvsecs(15.4)   # seconds 
@@ -79,15 +85,15 @@ def cvsecs(time):
     >>> cvsecs('33.5')      # only secs
     33.5
     """
-    factors = (1, 60, 3600)
+    multipliers = (1, 60, 3600)
     
-    if isinstance(time, str):
+    if isinstance(time, Real):
+        return float(time)
+
+    elif is_string(time):     
         time = [float(f.replace(',', '.')) for f in time.split(':')]
-
-    if not isinstance(time, (tuple, list)):
-        return time
-
-    return sum(mult * part for mult, part in zip(factors, reversed(time)))
+            
+    return sum(mult * part for mult, part in zip(multipliers, reversed(time)))
 
 
 def deprecated_version_of(f, oldname, newname=None):
