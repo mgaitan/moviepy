@@ -1,5 +1,3 @@
-from moviepy.decorators import apply_to_audio, apply_to_mask
-
 
 def speedx(clip, factor = None, final_duration=None):
     """
@@ -11,11 +9,5 @@ def speedx(clip, factor = None, final_duration=None):
     """
     
     if final_duration:
-        factor = 1.0* clip.duration / final_duration
-        
-    newclip = clip.fl_time(lambda t: factor * t, apply_to=['mask', 'audio'])
-    
-    if clip.duration is not None:
-        newclip = newclip.set_duration(1.0 * clip.duration / factor)
-    
-    return newclip
+        factor = 1.0 * clip.duration / final_duration
+    return clip[::factor]

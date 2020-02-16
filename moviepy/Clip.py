@@ -507,8 +507,27 @@ class Clip:
             # get a frame
             return self.get_frame(key)
         if isinstance(key, slice):
+            # support for [start:end:speed] slicing. If speed is negative
+            # a time_mirror is applied.
+            
             # get a subclip
-            return self.subclip(key.start or 0, key.stop or self.duration)
+            clip = self.subclip(key.start or 0, key.stop or self.duration)
+            if key.step:
+                # change speed of the subclip
+                apply_to = []
+                if hasattr(clip, 'mask'):
+                    apply_to.append('mask')
+                if hasattr(clip, 'audio'):
+                    apply_to.append('audio')
+                factor = abs(key.step)
+                if factor != 1:  
+                    # change speed              
+                    clip = clip.fl_time(lambda t: factor * t, apply_to=apply_to, keep_duration=True)
+                    clip = clip.set_duration(1.0 * clip.duration / factor)
+                if key.step < 0:
+                    # time mirror
+                    clip = clip.fl_time(lambda t: clip.duration - t, keep_duration=True, apply_to=apply_to)
+            return clip
         elif isinstance(key, tuple):
             # get a concatenation of subclips
             return reduce(add, (self[k] for k in key))
@@ -518,4 +537,10 @@ class Clip:
         other_type = type(other).__name__
         message = "unsupported operand type(s) for +: '{}' and '{}'"
         raise TypeError(message.format(self_type, other_type))
->>>>>>> c060949... implement basic add and getitem dunder methods
+
+    def __mul__(self, other):
+        self_type = type(self).__name__
+        other_type = type(other).__name__
+        if not isinstance(other, Real):
+            message = "unsupported operand type(s) for *: '{}' and '{}'"
+            raise TypeError(message.format(self_type, other_type))
