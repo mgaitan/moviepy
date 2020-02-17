@@ -18,7 +18,6 @@ from moviepy.decorators import (apply_to_audio, apply_to_mask,
 
 
 class Clip:
-
     """
 
      Base class of all clips (VideoClips and AudioClips).
@@ -177,10 +176,10 @@ class Clip:
         --------
 
         >>> # plays the clip (and its mask and sound) twice faster
-        >>> newclip = clip.fl_time(lambda: 2*t, apply_to=['mask', 'audio'])
+        >>> newclip = clip.fl_time(lambda t: 2*t, apply_to=['mask', 'audio'])
         >>>
         >>> # plays the clip starting at t=3, and backwards:
-        >>> newclip = clip.fl_time(lambda: 3-t)
+        >>> newclip = clip.fl_time(lambda t: 3-t)
 
         """
         if apply_to is None:
