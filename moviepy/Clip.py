@@ -540,16 +540,18 @@ class Clip:
         elif isinstance(key, tuple):
             # get a concatenation of subclips
             return reduce(add, (self[k] for k in key))
+        else:
+            return self.get_frame(key)
 
     def __add__(self, other):
-        self_type = type(self).__name__
-        other_type = type(other).__name__
-        message = "unsupported operand type(s) for +: '{}' and '{}'"
-        raise TypeError(message.format(self_type, other_type))
+        # concatenate. implemented in specialized classes
+        self.__unsupported(other, '+')
+        
+    def __mul__(self, n):
+        # loop n times
+        if not isinstance(n, Real):
+            self.__unsupported(n, '*')
 
-    def __mul__(self, other):
-        self_type = type(self).__name__
-        other_type = type(other).__name__
-        if not isinstance(other, Real):
-            message = "unsupported operand type(s) for *: '{}' and '{}'"
-            raise TypeError(message.format(self_type, other_type))
+        apply_to = self.__apply_to(self)
+        clip = self.fl_time(lambda t: t % self.duration, apply_to=apply_to, keep_duration=True)
+        return clip.set_duration(clip.duration * n)
