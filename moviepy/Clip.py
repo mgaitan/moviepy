@@ -493,6 +493,23 @@ class Clip:
         #    * Therefore, should NOT be called by __del__().
         pass
 
+
+    # helper private methods
+    def __unsupported(self, other, operator):
+        self_type = type(self).__name__
+        other_type = type(other).__name__
+        message = "unsupported operand type(s) for {}: '{}' and '{}'"
+        raise TypeError(message.format(operator, self_type, other_type))
+
+    @staticmethod
+    def __apply_to(clip):
+        apply_to = []
+        if getattr(clip, 'mask', None):
+            apply_to.append('mask')
+        if getattr(clip, 'audio', None):
+            apply_to.append('audio')
+        return apply_to
+
     # Support the Context Manager protocol, to ensure that resources are cleaned up.
 
     def __enter__(self):
