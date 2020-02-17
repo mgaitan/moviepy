@@ -1,15 +1,16 @@
 import os
-import sys
 
 import pytest
 from numpy import pi, sin
+from unittest.mock import patch, sentinel
+import numpy as np
 
 from moviepy.audio.AudioClip import AudioClip
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.utils import close_all_clips
 from moviepy.video.fx.speedx import speedx
 from moviepy.video.io.VideoFileClip import VideoFileClip
-from moviepy.video.VideoClip import ColorClip, VideoClip
+from moviepy.video.VideoClip import ColorClip
 
 from .test_helper import TMP_DIR
 
@@ -149,6 +150,48 @@ def test_withoutaudio():
     new_clip = clip.without_audio()
     assert new_clip.audio is None
     close_all_clips(locals())
+
+
+def test_indexing():
+    clip = VideoFileClip("media/big_buck_bunny_432_433.webm").subclip(0, 1)
+    assert np.array_equal(clip[0], clip.get_frame(0))
+    assert np.array_equal(clip[0.2], clip.get_frame(0.2))
+    assert np.array_equal(clip["0.2"], clip.get_frame(0.2))
+
+
+@pytest.mark.parametrize('given, expected', [
+    (slice(sentinel.start, sentinel.end), (sentinel.start, sentinel.end)),
+    (slice(None, 1.2), (0, 1.2)),
+    (slice(1.32, None), (1.32, 2)),
+    (slice(None, None), (0, 2)),
+])
+def test_slicing(given, expected):
+    clip = VideoFileClip("media/big_buck_bunny_432_433.webm").subclip(0, 2)
+    with patch.object(clip, 'subclip') as mock:
+        clip[given]
+    mock.assert_called_with(*expected)
+    
+
+def test_slicing_with_speed():
+    clip = VideoFileClip("media/big_buck_bunny_432_433.webm")[0:2]
+    new_clip = clip[::2]
+    assert new_clip.duration == 1.0
+    assert np.array_equal(new_clip[0.5], clip[1])
+
+
+def test_slicing_with_time_mirror():
+    clip = VideoFileClip("media/fire2.mp4")[0:2]
+    new_clip = clip[::-1]
+    assert new_clip.duration == 2
+    assert np.array_equal(new_clip[0.3], clip[1.7])
+
+
+def test_slicing_with_negative_speed():
+    clip = VideoFileClip("media/fire2.mp4")[0:2]
+    new_clip = clip[::-2]
+    assert new_clip.duration == 1
+    assert np.array_equal(new_clip[0.3], clip[1.4])
+
 
 
 if __name__ == "__main__":

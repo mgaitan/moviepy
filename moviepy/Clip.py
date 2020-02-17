@@ -519,9 +519,6 @@ class Clip:
         self.close()
 
     def __getitem__(self, key):        
-        if isinstance(key, Real):
-            # get a frame
-            return self.get_frame(key)
         if isinstance(key, slice):
             # support for [start:end:speed] slicing. If speed is negative
             # a time_mirror is applied.
@@ -530,11 +527,7 @@ class Clip:
             clip = self.subclip(key.start or 0, key.stop or self.duration)
             if key.step:
                 # change speed of the subclip
-                apply_to = []
-                if hasattr(clip, 'mask'):
-                    apply_to.append('mask')
-                if hasattr(clip, 'audio'):
-                    apply_to.append('audio')
+                apply_to = self.__apply_to(clip)
                 factor = abs(key.step)
                 if factor != 1:  
                     # change speed              
