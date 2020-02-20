@@ -766,6 +766,10 @@ class VideoClip(Clip):
             return concatenate_videoclips([self, other], method=method)
         return super(VideoClip, self).__add__(other)
 
+    def __and__(self, mask):
+        return self.set_mask(mask)
+
+
 
 class DataVideoClip(VideoClip):
     """
