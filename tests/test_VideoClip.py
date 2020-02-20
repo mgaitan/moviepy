@@ -193,6 +193,26 @@ def test_slicing_with_negative_speed():
     assert np.array_equal(new_clip[0.3], clip[1.4])
 
 
+def test_slicing_multiple():
+    clip = VideoFileClip("media/fire2.mp4")
+    new_clip = clip[0:1, 2:3.2]
+    assert new_clip.duration == 2.2
+    assert np.array_equal(new_clip[1.1], clip[2.1])
+
+
+def test_add():
+    clip = VideoFileClip("media/fire2.mp4")
+    new_clip = clip[0:1] + clip[2:3.2]
+    assert new_clip.duration == 2.2
+    assert np.array_equal(new_clip[1.1], clip[2.1])
+
+
+def test_mul():
+    clip = VideoFileClip("media/fire2.mp4")
+    new_clip = clip[0:1] * 2.5
+    assert new_clip.duration == 2.5
+    assert np.array_equal(new_clip[1.1], clip[0.1])
+
 
 if __name__ == "__main__":
     pytest.main()
