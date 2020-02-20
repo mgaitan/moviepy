@@ -543,10 +543,14 @@ class Clip:
         else:
             return self.get_frame(key)
 
+    def __del__(self):
+        self.close()
+
     def __add__(self, other):
         # concatenate. implemented in specialized classes
         self.__unsupported(other, '+')
         
+
     def __mul__(self, n):
         # loop n times
         if not isinstance(n, Real):
