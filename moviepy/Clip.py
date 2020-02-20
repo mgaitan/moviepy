@@ -56,6 +56,7 @@ class Clip:
         self.memoized_t = None
         self.memoize_frame = None
 
+
     def copy(self):
         """ Shallow copy of the clip. 
         
@@ -66,13 +67,14 @@ class Clip:
         there is an outplace transformation of the clip (clip.resize,
         clip.subclip, etc.)
         """
+        return copy(self)
 
-        newclip = copy(self)
+    def __copy__(self):
+        newclip = copy(super(Clip, self))
         if hasattr(self, 'audio'):
             newclip.audio = copy(self.audio)
         if hasattr(self, 'mask'):
             newclip.mask = copy(self.mask)
-            
         return newclip
 
     @convert_to_seconds(['t'])
@@ -209,7 +211,6 @@ class Clip:
         >>> resize( volumex( mirrorx( clip ), 0.5), 0.3)
 
         """
-
         return func(self, *args, **kwargs)
 
 
@@ -223,7 +224,6 @@ class Clip:
         Returns a copy of the clip, with the ``start`` attribute set
         to ``t``, which can be expressed in seconds (15.35), in (min, sec),
         in (hour, min, sec), or as a string: '01:03:05.35'.
-
 
         If ``change_end=True`` and the clip has a ``duration`` attribute,
         the ``end`` atrribute of the clip will be updated to
