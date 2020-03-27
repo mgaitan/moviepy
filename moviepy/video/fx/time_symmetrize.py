@@ -1,5 +1,6 @@
 from moviepy.decorators import requires_duration
 
+
 @requires_duration
 def time_symmetrize(clip):
     """

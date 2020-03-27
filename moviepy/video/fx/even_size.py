@@ -11,13 +11,13 @@ def even_size(clip):
     h_even = h % 2 == 0
     if w_even and h_even:
         return clip
-    
+
     def fl_image(a):
         if not w_even and not h_even:
-            return a[:-1,:-1,:]
+            return a[:-1, :-1, :]
         elif w_even:
-            return a[:,:-1,:]
+            return a[:, :-1, :]
         else:
-            return a[:-1,:,:]
+            return a[:-1, :, :]
 
     return clip.fl_image(fl_image)

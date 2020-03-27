@@ -8,4 +8,4 @@ def time_mirror(self):
     The clip must have its ``duration`` attribute set.
     The same effect is applied to the clip's audio and mask if any.
     """
-    return self[::-1]    
+    return self[::-1]
