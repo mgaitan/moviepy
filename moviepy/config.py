@@ -40,9 +40,7 @@ elif FFMPEG_BINARY == "auto-detect":
 else:
     success, err = try_cmd([FFMPEG_BINARY])
     if not success:
-        raise IOError(
-            str(err) + " - The path specified for the ffmpeg binary might be wrong"
-        )
+        raise IOError(str(err) + " - The path specified for the ffmpeg binary might be wrong")
 
 if IMAGEMAGICK_BINARY == "auto-detect":
     if os.name == "nt":
@@ -51,28 +49,31 @@ if IMAGEMAGICK_BINARY == "auto-detect":
             IMAGEMAGICK_BINARY = wr.QueryValueEx(key, "BinPath")[0] + r"\convert.exe"
             key.Close()
         except:
-            IMAGEMAGICK_BINARY = "unset"
+            # Try to detect any ImageMagick version installed
+            try:
+                imagemagick_path = sp.check_output(
+                    ["dir", "/B", "/O-N", r'"C:\Program Files\ImageMagick-*"'], encoding="utf-8",
+                ).split("\r\n")[0]
+                IMAGEMAGICK_BINARY = sp.check_output(
+                    ["dir", "/B", "/S", fr'"C:\Program Files\{imagemagick_path}\*convert.exe"'],
+                    encoding="utf-8",
+                ).split("\r\n")[0]
+            except:
+                IMAGEMAGICK_BINARY = "unset"
     elif try_cmd(["convert"])[0]:
         IMAGEMAGICK_BINARY = "convert"
     else:
         IMAGEMAGICK_BINARY = "unset"
 else:
     if not os.path.exists(IMAGEMAGICK_BINARY):
-        raise IOError(
-            "ImageMagick binary cannot be found at {}".format(IMAGEMAGICK_BINARY)
-        )
+        raise IOError(f"ImageMagick binary cannot be found at {IMAGEMAGICK_BINARY}")
 
     if not os.path.isfile(IMAGEMAGICK_BINARY):
-        raise IOError(
-            "ImageMagick binary found at {} is not a file".format(IMAGEMAGICK_BINARY)
-        )
+        raise IOError(f"ImageMagick binary found at {IMAGEMAGICK_BINARY} is not a file")
 
     success, err = try_cmd([IMAGEMAGICK_BINARY])
     if not success:
-        raise IOError(
-            "%s - The path specified for the ImageMagick binary might "
-            "be wrong: %s" % (err, IMAGEMAGICK_BINARY)
-        )
+        raise IOError(f"{err} - The path specified for the ImageMagick binary might " "be wrong: {IMAGEMAGICK_BINARY}")
 
 
 def get_setting(varname):
